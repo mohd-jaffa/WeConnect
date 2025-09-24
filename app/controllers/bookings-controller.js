@@ -106,4 +106,25 @@ bookingsController.viewBooking = async (req, res) => {
     }
 };
 
+//! <-------------------- CANCEL A BOOKING --------------------> !\\
+
+bookingsController.cancelBooking = async (req, res) => {
+    const id = req.params.id;
+    const userId = req.userId;
+    try {
+        const booking = await Booking.findOneAndUpdate(
+            { _id: id, $or: [{ teachersId: userId }, { studentsId: userId }] },
+            { $set: { status: "cancelled" } },
+            { new: true }
+        );
+        if (!booking) {
+            return res.status(404).json({ error: "booking not found!" });
+        }
+        res.json(booking);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "something went wrong!!!" });
+    }
+};
+
 module.exports = bookingsController;

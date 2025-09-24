@@ -37,6 +37,7 @@ app.delete("/api/teachers/sessions/:id", authenticateUser, teachersController.re
 app.get("/api/bookings", authenticateUser, bookingsController.viewAllMyBookings);
 app.get("/api/bookings/:id", authenticateUser, bookingsController.viewBooking);
 app.post("/api/bookings", authenticateUser, bookingsController.bookNewSlot);
+app.put("/api/bookings/:id", authenticateUser, bookingsController.cancelBooking);
 
 // Dynamic routes — placed LAST to avoid conflict
 app.get("/api/teachers/:id", usersController.viewTeacher);
