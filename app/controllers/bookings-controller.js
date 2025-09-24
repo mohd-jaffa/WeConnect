@@ -92,7 +92,7 @@ bookingsController.viewAllMyBookings = async (req, res) => {
 bookingsController.viewBooking = async (req, res) => {
     const id = req.params.id;
     try {
-        const booking = await Booking.findById({
+        const booking = await Booking.findOne({
             _id: id,
             $or: [{ teachersId: id }, { studentsId: id }],
         });
