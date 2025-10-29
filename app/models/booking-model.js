@@ -33,6 +33,9 @@ const bookingSchema = mongoose.Schema(
             required: true,
             default: "upcoming",
         },
+        meetLink: {
+            type: String,
+        },
     },
     { timestamps: true }
 );

@@ -132,6 +132,4 @@ teachersController.removeSession = async (req, res) => {
 //     }
 // };
 
-
-
 module.exports = teachersController;

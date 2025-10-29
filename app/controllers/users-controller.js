@@ -14,7 +14,10 @@ const usersController = {};
 //! <-------------------- REGISTER --------------------> !\\
 
 usersController.register = async (req, res) => {
-    const body = req.body;
+    const body =
+        req.body.role === "teacher"
+            ? { ...req.body, isApproved: false }
+            : req.body;
     let validationType;
     if (body.role == "teacher") {
         validationType = teacherRegisterValidationSchema;
@@ -96,13 +99,14 @@ usersController.updateProfile = async (req, res) => {
     const id = req.userId;
     const { error, value } = updateProfileSchema.validate(body, {
         abortEarly: false,
+        allowUnknown: true,
     });
     if (error) {
         return res.status(400).json({ error: error.details });
     }
     try {
-        if (value == undefined) {
-            return res.json(await User.findById(id));
+        if (!value || Object.keys(value).length === 0) {
+            return res.status(400).json({ error: "No valid fields to update" });
         }
         const user = await User.findByIdAndUpdate(
             id,
@@ -138,7 +142,7 @@ usersController.listTeachers = async (req, res) => {
 
 usersController.listSessions = async (req, res) => {
     try {
-        const session = await Session.find();
+        const session = await Session.find().populate("teachersId");
         if (!session) {
             return res.status(404).json({ error: "no sessions found!" });
         }
@@ -196,7 +200,9 @@ usersController.viewTeacher = async (req, res) => {
 usersController.viewSession = async (req, res) => {
     const id = req.params.id;
     try {
-        const session = await Session.findOne({ _id: id });
+        const session = await Session.findOne({ _id: id }).populate(
+            "teachersId"
+        );
         if (!session) {
             return res.status(404).json({ error: "session not found!" });
         }

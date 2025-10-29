@@ -45,7 +45,7 @@ const sessionSchema = mongoose.Schema(
         description: {
             type: String,
             min: 5,
-            max: 512,
+            max: 1024,
         },
         teachersId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -60,6 +60,11 @@ const sessionSchema = mongoose.Schema(
             type: [slotSchema],
             default: undefined,
         },
+        thumbnail: {
+            type: String,
+            required: true,
+        },
+        amount: Number,
     },
     { timestamps: true }
 );

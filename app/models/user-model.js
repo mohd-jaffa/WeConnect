@@ -20,9 +20,6 @@ const userSchema = mongoose.Schema(
         bio: {
             type: String,
         },
-        category: {
-            type: String,
-        },
         skills: {
             type: [String],
             default: undefined,
@@ -35,6 +32,13 @@ const userSchema = mongoose.Schema(
             type: String,
             enum: ["student", "teacher"],
             required: true,
+        },
+        isApproved: {
+            type: Boolean,
+            default: false,
+        },
+        avatar: {
+            type: String,
         },
     },
     { timestamps: true }

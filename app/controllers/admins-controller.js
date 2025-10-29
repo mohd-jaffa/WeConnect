@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/user-model");
 const Session = require("../models/session-model");
+const Booking = require("../models/booking-model");
 
 const adminsController = {};
 
@@ -43,6 +44,22 @@ adminsController.viewAllSessions = async (req, res) => {
             return res.status(404).json({ error: "sessions not found" });
         }
         res.status(200).json(session);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "something went wrong!!!" });
+    }
+};
+
+adminsController.viewAllBookings = async (req, res) => {
+    try {
+        const booking = await Booking.find()
+            .populate("teachersId")
+            .populate("studentsId")
+            .populate("details");
+        if (booking.length === 0) {
+            return res.status(404).json({ error: "sessions not found" });
+        }
+        res.status(200).json(booking);
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "something went wrong!!!" });

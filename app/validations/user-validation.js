@@ -4,8 +4,8 @@ const teacherRegisterValidationSchema = Joi.object({
     name: Joi.string().trim().required().min(5).max(30),
     email: Joi.string().email().required().trim(),
     password: Joi.string().trim().required().min(8).max(128),
-    category: Joi.string().trim().required(),
     role: Joi.string().trim().required().valid("teacher"),
+    isApproved: Joi.boolean().optional(),
 });
 
 const studentRegisterValidationSchema = Joi.object({
@@ -21,11 +21,11 @@ const userLoginValidationSchema = Joi.object({
 });
 
 const updateProfileSchema = Joi.object({
-    name: Joi.string().trim().min(5).max(30),
-    email: Joi.string().email().trim(),
-    category: Joi.string().trim(),
-    skills: Joi.array().items(Joi.string().min(4).max(32).trim()),
-    bio: Joi.string().min(5).max(128).trim(),
+    name: Joi.string().trim().min(5).max(30).optional(),
+    email: Joi.string().email().trim().optional(),
+    skills: Joi.array().items(Joi.string().max(32).trim()).optional(),
+    bio: Joi.string().min(5).max(128).trim().optional(),
+    avatar: Joi.string().uri().optional().trim(),
 });
 
 module.exports = {

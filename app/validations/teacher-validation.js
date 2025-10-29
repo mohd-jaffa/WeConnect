@@ -120,16 +120,20 @@ const updateSchema = Joi.object({
 
 const addSessionValidationSchema = Joi.object({
     title: Joi.string().trim().required().min(5).max(128),
-    description: Joi.string().trim().min(5).max(512),
+    description: Joi.string().trim().min(5).max(1024),
     category: Joi.string().trim().required().min(4).max(32),
     slots: Joi.array().items(addSchema).required(),
+    thumbnail: Joi.string().uri(),
+    amount: Joi.number().min(1).required(),
 });
 
 const updateSessionValidationSchema = Joi.object({
     title: Joi.string().trim().min(5).max(128),
-    description: Joi.string().trim().min(5).max(512),
+    description: Joi.string().trim().min(5).max(1024),
     category: Joi.string().trim().min(4).max(32),
     slots: Joi.array().items(updateSchema),
+    thumbnail: Joi.string().uri(),
+    amount: Joi.number().min(1).required(),
 });
 
 module.exports = { addSessionValidationSchema, updateSessionValidationSchema };
