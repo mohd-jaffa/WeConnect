@@ -27,11 +27,12 @@ app.post("/api/login", usersController.login);
 // General public routes
 app.get("/api/teachers", usersController.listTeachers);
 app.get("/api/sessions", usersController.listSessions);
-app.get("/api/search", usersController.search);
+app.post("/api/search", usersController.search);
 
 // Authenticated user profile
 app.get("/api/users/profile", authenticateUser, usersController.profile);
 app.put("/api/users/profile", authenticateUser, usersController.updateProfile);
+app.put("/api/users/password", authenticateUser, usersController.changePassword);
 
 // Teacher session routes — specific routes BEFORE parameterized
 app.get(
@@ -91,6 +92,10 @@ app.get(
 // Dynamic routes — placed LAST to avoid conflict
 app.get("/api/teachers/:id", usersController.viewTeacher);
 app.get("/api/sessions/:id", usersController.viewSession);
+app.get(
+    "/api/teachers/:id/sessions/",
+    teachersController.listTeachersAllSessions
+);
 
 app.post("/api/avatar", authenticateUser, uploadMiddleware, imageUpload.avatar);
 app.post(
@@ -119,6 +124,11 @@ app.post(
     "/api/payment/history",
     authenticateUser,
     paymentController.addHistory
+);
+app.get(
+    "/api/payment/history/:id",
+    authenticateUser,
+    paymentController.getHistory
 );
 
 app.listen(port, () => {

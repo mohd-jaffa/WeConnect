@@ -258,7 +258,7 @@ bookingsController.getSlots = async (req, res) => {
     }
 };
 
-//! <-------------------- VIEW FREE SLOTS --------------------> !\\
+//! <-------------------- CHECK LOCK SLOTS --------------------> !\\
 
 bookingsController.checkLock = async (req, res) => {
     const body = req.body;

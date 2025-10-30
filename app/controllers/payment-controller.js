@@ -151,4 +151,19 @@ paymentController.addHistory = async (req, res) => {
     }
 };
 
+paymentController.getHistory = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const history = await Payment.find({ userId: id })
+            .populate("sessionId")
+            .populate("userId");
+        if (history.length === 0) {
+            return res.status(404).json({ error: "No payment history found!" });
+        }
+        res.json(history);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};
+
 module.exports = paymentController;

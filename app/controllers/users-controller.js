@@ -155,27 +155,65 @@ usersController.listSessions = async (req, res) => {
 
 //! <-------------------- SEARCH QUERY --------------------> !\\
 
+// usersController.search = async (req, res) => {
+//     const filter = {};
+//     const sessionFilter = {};
+//     if (req.query.name) filter.name = { $regex: req.query.name, $options: "i" };
+//     if (req.query.category)
+//         filter.category = { $regex: req.query.category, $options: "i" };
+//     if (req.query.skills)
+//         filter.skills = { $regex: req.query.skills, $options: "i" };
+//     if (req.query.sessions)
+//         sessionFilter.title = { $regex: req.query.sessions, $options: "i" };
+//     try {
+//         const [users, sessions] = await Promise.all([
+//             Object.keys(filter).length > 0 ? User.find(filter) : [],
+//             Object.keys(sessionFilter).length > 0
+//                 ? Session.find(sessionFilter)
+//                 : [],
+//         ]);
+//         return res.json({ users, sessions });
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).json({ error: "something went wrong!!!" });
+//     }
+// };
+
 usersController.search = async (req, res) => {
-    const filter = {};
-    const sessionFilter = {};
-    if (req.query.name) filter.name = { $regex: req.query.name, $options: "i" };
-    if (req.query.category)
-        filter.category = { $regex: req.query.category, $options: "i" };
-    if (req.query.skills)
-        filter.skills = { $regex: req.query.skills, $options: "i" };
-    if (req.query.sessions)
-        sessionFilter.title = { $regex: req.query.sessions, $options: "i" };
     try {
+        const { keyword } = req.body;
+
+        if (!keyword || keyword.trim() === "") {
+            return res.status(400).json({ error: "Keyword is required" });
+        }
+
+        // Case-insensitive regex pattern
+        const regex = new RegExp(keyword.trim(), "i");
+
+        // Search Teachers (role = "teacher") by name or skills
+        const userFilter = {
+            role: "teacher",
+            $or: [{ name: { $regex: regex } }, { skills: { $regex: regex } }],
+        };
+
+        // Search Sessions by title or category
+        const sessionFilter = {
+            $or: [
+                { title: { $regex: regex } },
+                { category: { $regex: regex } },
+            ],
+        };
+
+        // Run both in parallel
         const [users, sessions] = await Promise.all([
-            Object.keys(filter).length > 0 ? User.find(filter) : [],
-            Object.keys(sessionFilter).length > 0
-                ? Session.find(sessionFilter)
-                : [],
+            User.find(userFilter), // Optional: return only needed fields
+            Session.find(sessionFilter).populate("teachersId"),
         ]);
-        return res.json({ users, sessions });
+
+        return res.status(200).json({ users, sessions });
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "something went wrong!!!" });
+        console.error("Search Error:", err);
+        res.status(500).json({ error: "Something went wrong!" });
     }
 };
 
@@ -210,6 +248,42 @@ usersController.viewSession = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "something went wrong!!!" });
+    }
+};
+
+//! <-------------------- CHANGE PASSWORD --------------------> !\\
+
+usersController.changePassword = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { oldPassword, newPassword, confirmNewPassword } = req.body;
+        if (!oldPassword || !newPassword || !confirmNewPassword) {
+            return res.status(400).json({ error: "All fields are required" });
+        }
+        if (newPassword.length < 8) {
+            return res
+                .status(400)
+                .json({ error: "New password must be at least 8 characters" });
+        }
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({ error: "Passwords do not match" });
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const isMatch = await bcrypts.compare(oldPassword, user.passwordHash);
+        if (!isMatch) {
+            return res.status(400).json({ error: "Incorrect old password" });
+        }
+        const salt = await bcrypts.genSalt();
+        const newHash = await bcrypts.hash(newPassword, salt);
+        user.passwordHash = newHash;
+        await user.save();
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Something went wrong" });
     }
 };
 

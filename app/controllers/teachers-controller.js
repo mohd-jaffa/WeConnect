@@ -117,19 +117,17 @@ teachersController.removeSession = async (req, res) => {
     }
 };
 
-//! <-------------------- LIST MY BOOKINGS --------------------> !\\
+//! <-------------------- LIST A TEACHERS ALL SESSIONS --------------------> !\\
 
-// teachersController.viewMyBookings = async (req, res) => {
-//     try {
-//         const booking = await Booking.find({ teachersId: req.userId });
-//         if (booking.length === 0) {
-//             return res.status(404).json({ error: "bookings not found!" });
-//         }
-//         res.json(booking);
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({ error: "something went wrong!!!" });
-//     }
-// };
+teachersController.listTeachersAllSessions = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const session = await Session.find({ teachersId: id });
+        res.json(session);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "something went wrong!!!" });
+    }
+};
 
 module.exports = teachersController;
