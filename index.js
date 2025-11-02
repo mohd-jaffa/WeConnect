@@ -14,6 +14,7 @@ const adminsController = require("./app/controllers/admins-controller");
 const uploadMiddleware = require("./app/middlewares/fileUploadMiddleware");
 const imageUpload = require("./app/controllers/upload-controllers");
 const paymentController = require("./app/controllers/payment-controller");
+const assignmentController = require("./app/controllers/assignment-controller");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,7 +33,11 @@ app.post("/api/search", usersController.search);
 // Authenticated user profile
 app.get("/api/users/profile", authenticateUser, usersController.profile);
 app.put("/api/users/profile", authenticateUser, usersController.updateProfile);
-app.put("/api/users/password", authenticateUser, usersController.changePassword);
+app.put(
+    "/api/users/password",
+    authenticateUser,
+    usersController.changePassword
+);
 
 // Teacher session routes — specific routes BEFORE parameterized
 app.get(
@@ -129,6 +134,27 @@ app.get(
     "/api/payment/history/:id",
     authenticateUser,
     paymentController.getHistory
+);
+
+app.post(
+    "/api/assignment/generate",
+    authenticateUser,
+    assignmentController.generateAssignment
+);
+app.get(
+    "/api/assignment/:id",
+    authenticateUser,
+    assignmentController.getAssignment
+);
+app.post(
+    "/api/assignment/submit",
+    authenticateUser,
+    assignmentController.submitAnswers
+);
+app.get(
+    "/api/assignment/",
+    authenticateUser,
+    assignmentController.getAllAssignments
 );
 
 app.listen(port, () => {

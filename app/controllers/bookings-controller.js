@@ -123,21 +123,28 @@ bookingsController.viewBooking = async (req, res) => {
 bookingsController.cancelBooking = async (req, res) => {
     const id = req.params.id;
     const userId = req.userId;
+
     try {
         const booking = await Booking.findOneAndUpdate(
-            { _id: id, $or: [{ teachersId: userId }, { studentsId: userId }] },
+            { _id: id, $or: [{ teacherId: userId }, { studentId: userId }] },
             { $set: { status: "cancelled" } },
             { new: true }
-        );
+        ).populate("studentId teacherId details");
+
         if (!booking) {
-            return res.status(404).json({ error: "booking not found!" });
+            return res.status(404).json({ error: "Booking not found!" });
         }
-        res.json(booking);
+
+        res.json({
+            message: "Booking cancelled successfully!",
+            booking,
+        });
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "something went wrong!!!" });
+        console.error("Cancel booking error:", err);
+        res.status(500).json({ error: "Something went wrong!" });
     }
 };
+
 
 //! <-------------------- VIEW FREE SLOTS --------------------> !\\
 
