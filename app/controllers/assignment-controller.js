@@ -197,7 +197,7 @@ assignmentController.getAllAssignments = async (req, res) => {
             .populate("studentId", "name email")
             .populate("instructorId", "name email");
         if (assignment.length === 0) {
-            return res.json({ message: "no records found" });
+            return res.json([]);
         }
         res.status(200).json(assignment);
     } catch (err) {
