@@ -97,6 +97,11 @@ usersController.profile = async (req, res) => {
 usersController.updateProfile = async (req, res) => {
     const body = req.body;
     const id = req.userId;
+
+    Object.keys(body).forEach(
+      (key) => body[key] === "" && delete body[key]
+    );
+    
     const { error, value } = updateProfileSchema.validate(body, {
         abortEarly: false,
         allowUnknown: true,
