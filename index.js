@@ -5,7 +5,7 @@ const authenticateUser = require("./app/middlewares/authenticateUser");
 const teachersController = require("./app/controllers/teachers-controller");
 const bookingsController = require("./app/controllers/bookings-controller");
 require("dotenv").config();
-// require("./app/cron/booking-status-cron");
+require("./app/cron/booking-status-cron");
 
 const port = process.env.PORT;
 const app = express();

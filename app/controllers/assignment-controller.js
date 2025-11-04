@@ -191,7 +191,11 @@ assignmentController.submitAnswers = async (req, res) => {
 assignmentController.getAllAssignments = async (req, res) => {
     const id = req.userId;
     try {
-        const assignment = await Assignment.find({ studentId: id });
+        const assignment = await Assignment.find({
+            $or: [{ studentId: id }, { instructorId: id }],
+        })
+            .populate("studentId", "name email")
+            .populate("instructorId", "name email");
         if (assignment.length === 0) {
             return res.json({ message: "no records found" });
         }
