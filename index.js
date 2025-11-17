@@ -65,6 +65,16 @@ app.delete(
     authenticateUser,
     teachersController.removeSession
 );
+app.get(
+    "/api/teachers/students",
+    authenticateUser,
+    teachersController.listAllMyStudents
+);
+app.get(
+    "/api/teachers/students/:id",
+    authenticateUser,
+    teachersController.viewStudentAllDetails
+);
 
 // Booking routes
 app.get(
@@ -96,6 +106,7 @@ app.get(
 
 // Dynamic routes — placed LAST to avoid conflict
 app.get("/api/teachers/:id", usersController.viewTeacher);
+app.get("/api/students/:id", usersController.viewStudent);
 app.get("/api/sessions/:id", usersController.viewSession);
 app.get(
     "/api/teachers/:id/sessions/",

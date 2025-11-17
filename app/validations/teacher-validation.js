@@ -12,7 +12,6 @@ const addSchema = Joi.object({
             then: Joi.required(),
             otherwise: Joi.forbidden(),
         }),
-
     endDate: Joi.string()
         .pattern(
             /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
@@ -64,21 +63,17 @@ const addSchema = Joi.object({
 const updateSchema = Joi.object({
     isRecurring: Joi.boolean().optional(),
 
-    startDate: Joi.date()
-        .iso()
-        .when("isRecurring", {
-            is: Joi.valid(false).required(),
-            then: Joi.optional(),
-            otherwise: Joi.forbidden(),
-        }),
+    startDate: Joi.string().when("isRecurring", {
+        is: Joi.valid(false).required(),
+        then: Joi.optional(),
+        otherwise: Joi.forbidden(),
+    }),
 
-    endDate: Joi.date()
-        .iso()
-        .when("isRecurring", {
-            is: Joi.valid(false).required(),
-            then: Joi.optional(),
-            otherwise: Joi.forbidden(),
-        }),
+    endDate: Joi.string().when("isRecurring", {
+        is: Joi.valid(false).required(),
+        then: Joi.optional(),
+        otherwise: Joi.forbidden(),
+    }),
 
     startTime: Joi.string()
         .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)

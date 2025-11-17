@@ -50,6 +50,8 @@ adminsController.viewAllSessions = async (req, res) => {
     }
 };
 
+//! <-------------------- VIEW ALL BOOKINGS --------------------> !\\
+
 adminsController.viewAllBookings = async (req, res) => {
     try {
         const booking = await Booking.find()
