@@ -145,7 +145,6 @@ bookingsController.cancelBooking = async (req, res) => {
     }
 };
 
-
 //! <-------------------- VIEW FREE SLOTS --------------------> !\\
 
 bookingsController.getSlots = async (req, res) => {

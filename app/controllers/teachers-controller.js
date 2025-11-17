@@ -4,6 +4,9 @@ const {
     addSessionValidationSchema,
     updateSessionValidationSchema,
 } = require("../validations/teacher-validation");
+const mongoose = require("mongoose");
+const User = require("../models/user-model");
+const Assignment = require("../models/assignment-model");
 
 const teachersController = {};
 
@@ -74,6 +77,7 @@ teachersController.updateSession = async (req, res) => {
     const { error, value } = updateSessionValidationSchema.validate(body, {
         abortEarly: false,
     });
+    console.log(body);
     if (error) {
         return res.status(400).json({ error: error.details });
     }
@@ -127,6 +131,75 @@ teachersController.listTeachersAllSessions = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "something went wrong!!!" });
+    }
+};
+
+//! <-------------------- LIST ALL STUDENTS OF A TEACHER --------------------> !\\
+
+teachersController.listAllMyStudents = async (req, res) => {
+    const id = new mongoose.Types.ObjectId(req.userId);
+    try {
+        const result = await Booking.aggregate([
+            { $match: { teachersId: id } },
+            { $group: { _id: "$studentsId" } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "studentInfo",
+                },
+            },
+            { $unwind: "$studentInfo" },
+            {
+                $project: {
+                    _id: "$studentInfo._id",
+                    name: "$studentInfo.name",
+                    email: "$studentInfo.email",
+                    avatar: "$studentInfo.avatar",
+                    bio: "$studentInfo.bio",
+                },
+            },
+        ]);
+        if (!result.length) {
+            return res.status(404).json("No students found for this teacher.");
+        }
+        res.status(200).json(result);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "something went wrong!!!" });
+    }
+};
+
+//! <-------------------- VIEW MY STUDENTS DETAILS --------------------> !\\
+
+teachersController.viewStudentAllDetails = async (req, res) => {
+    const studentId = req.params.id;
+    const teacherId = req.userId;
+
+    try {
+        const student = await User.findById(studentId).select("-passwordHash");
+        if (!student) {
+            return res.status(404).json({ message: "Student not found!" });
+        }
+        const bookings = await Booking.find({
+            teachersId: teacherId,
+            studentsId: studentId,
+        })
+            .populate("details")
+            .sort({ "time.start": -1 });
+        const assignments = await Assignment.find({
+            teacherId: teacherId,
+            studentId: studentId,
+        }).sort({ createdAt: -1 });
+        res.json({
+            student,
+            bookings,
+            assignments,
+        });
+    } catch (err) {
+        console.error("Error in viewStudentAllDetails:", err);
+        res.status(500).json({ error: "Something went wrong!" });
     }
 };
 

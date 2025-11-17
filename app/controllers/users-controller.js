@@ -224,7 +224,23 @@ usersController.viewTeacher = async (req, res) => {
     try {
         const user = await User.findOne({ _id: id });
         if (!user) {
-            return res.status(404).json({ error: "teacher not found!" });
+            return res.status(404).json("user not found!");
+        }
+        res.json(user);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "something went wrong!!!" });
+    }
+};
+
+//! <-------------------- VIEW A STUDENTS DETAILS --------------------> !\\
+
+usersController.viewStudent = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const user = await User.findOne({ _id: id });
+        if (!user) {
+            return res.status(404).json("user not found!");
         }
         res.json(user);
     } catch (err) {
