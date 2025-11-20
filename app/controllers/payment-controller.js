@@ -2,6 +2,7 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const paymentValidationSchema = require("../validations/payment-validation");
 const Payment = require("../models/payment-model");
+const Session = require("../models/session-model");
 require("dotenv").config();
 
 const razorpay = new Razorpay({
@@ -14,30 +15,28 @@ const paymentController = {};
 paymentController.createOrder = async (req, res) => {
     console.log("Payment creation endpoint hit");
     try {
-        const { amount } = req.body;
+        const { sessionId } = req.body;
         console.log("Request body:", req.body);
-
+        const session = await Session.findById(sessionId);
+        if (!session) {
+            return res.status(404).json({ error: "Session not found" });
+        }
+        const amount = session.amount;
         if (!amount) {
             return res.status(400).json({ error: "Missing required fields" });
         }
-
-        // Ensure amount is positive
         if (amount <= 0) {
             return res
                 .status(400)
                 .json({ error: "Amount must be greater than zero" });
         }
-
         console.log("Creating Razorpay Order...");
-
         const order = await razorpay.orders.create({
-            amount: amount * 100, // Convert to paise
+            amount: amount * 100,
             currency: "INR",
             receipt: `receipt_${Date.now()}`,
         });
-
         console.log("Razorpay Order Response:", order);
-
         if (!order || !order.id) {
             console.error(
                 "Error: Order ID is missing in the Razorpay response"
@@ -46,39 +45,11 @@ paymentController.createOrder = async (req, res) => {
                 error: "Failed to create Razorpay order. Order ID is missing",
             });
         }
-
         console.log("Order ID:", order.id);
-
-        // Generate transaction ID
-        const generateTransactionId = () => {
-            return `temp_${Date.now()}_${Math.random()
-                .toString(36)
-                .substr(2, 9)}`;
-        };
-        // const newPayment = new Payment({
-        //     userId: req.currentUser.userId,
-        //     carId,
-        //     bookingId,
-        //     amount,
-        //     currency: "INR",
-        //     paymentStatus: "Pending",
-        //     paymentMethod,
-        //     paymentOrderId: order.id,
-        //     transactionId: generateTransactionId(),
-        // });
-
-        // // Save payment
-        // const savedPayment = await newPayment.save();
-
-        // // Populate car data after saving payment
-        // const populatedPayment = await Payment.findById(
-        //     savedPayment._id
-        // ).populate("carId");
-
         res.json({
             orderId: order.id,
             key: process.env.RAZORPAY_KEY_ID,
-            // payment: populatedPayment, // Send populated payment with car data
+            amount: order.amount,
         });
     } catch (err) {
         console.error("Error creating payment:", err);

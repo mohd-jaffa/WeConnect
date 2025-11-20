@@ -123,12 +123,12 @@ app.post(
 
 app.post(
     "/api/payment/create",
-
+    authenticateUser,
     paymentController.createOrder
 );
 app.post(
     "/api/payment/verify",
-
+    authenticateUser,
     paymentController.verifyPayment
 );
 app.post(
