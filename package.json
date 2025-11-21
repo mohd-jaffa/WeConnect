@@ -26,6 +26,7 @@
         "mongoose": "^8.18.2",
         "node-cron": "^4.2.1",
         "openai": "^6.7.0",
-        "razorpay": "^2.9.6"
+        "razorpay": "^2.9.6",
+        "socket.io": "^4.8.1"
     }
 }

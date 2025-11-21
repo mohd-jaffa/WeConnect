@@ -69,7 +69,7 @@ usersController.login = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ error: "Invalid email / password" });
         }
-        const tokenData = { userId: user._id };
+        const tokenData = { userId: user._id, role: user.role };
         const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
             expiresIn: "7d",
         });
@@ -98,10 +98,8 @@ usersController.updateProfile = async (req, res) => {
     const body = req.body;
     const id = req.userId;
 
-    Object.keys(body).forEach(
-      (key) => body[key] === "" && delete body[key]
-    );
-    
+    Object.keys(body).forEach((key) => body[key] === "" && delete body[key]);
+
     const { error, value } = updateProfileSchema.validate(body, {
         abortEarly: false,
         allowUnknown: true,
